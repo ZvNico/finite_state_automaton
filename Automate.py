@@ -268,6 +268,9 @@ class Automate:
         """transformation de l'automate deterministe complet pour que celui ci reconnaisse le langage complémentaire à celui actuel"""
         self.terminal = [etat for etat in self.etats if etat not in self.terminal]
 
+    def minimiser(self) -> None:
+        """"""
+
     def automate_standard(self) -> None:
         """transformation de l'automate en automate standart"""
         if len(self.initial) > 1:

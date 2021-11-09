@@ -1,12 +1,12 @@
 digraph {
 	rankdir=LR
 	bgcolor=transparent
-	0 [fillcolor=white shape=circle style=filled]
-	1 [fillcolor=lightblue style=filled]
-	2 [fillcolor=white shape=circle style=filled]
-	3 [fillcolor=white shape=circle style=filled]
-	4 [fillcolor=lightcoral style=filled]
-	0 -> 0 [label=a]
+	1 [fillcolor="lightblue:lightcoral" style=wedged]
+	2 [fillcolor=lightcoral style=filled]
+	3 [fillcolor=lightcoral style=filled]
+	4 [fillcolor=white shape=circle style=filled]
+	0 [fillcolor=lightcoral style=filled]
+	p [fillcolor=lightcoral style=filled]
 	1 -> 1 [label=a]
 	1 -> 2 [label=b]
 	1 -> 3 [label=c]
@@ -23,4 +23,12 @@ digraph {
 	4 -> 0 [label=b]
 	4 -> 0 [label=c]
 	4 -> 4 [label=d]
+	0 -> 0 [label=a]
+	0 -> p [label=b]
+	0 -> p [label=c]
+	0 -> p [label=d]
+	p -> p [label=a]
+	p -> p [label=b]
+	p -> p [label=c]
+	p -> p [label=d]
 }

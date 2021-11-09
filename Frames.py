@@ -1,6 +1,7 @@
 from Automate import Automate
 import tkinter as tk
 from PIL import ImageTk, Image
+from typing import Callable
 
 
 class AutomatonList(tk.Frame):
@@ -15,7 +16,7 @@ class AutomatonList(tk.Frame):
         self.option_menu = tk.OptionMenu(self, self.var, *self.filenames)
         self.option_menu.pack()
 
-    def add_automaton(self, filename: str):
+    def add_automaton(self, filename: str) -> None:
         self.automates[f"{filename}"] = Automate(filename)
         self.filenames.append(filename)
         self.option_menu['menu'].delete(0, 'end')
@@ -34,31 +35,31 @@ class PrettyTableFrame(tk.Frame):
         self.label = tk.Label(self, textvariable=self.var, font=("Courier", 11))
         self.label.pack()
 
-    def refresh(self, automaton):
+    def refresh(self, automaton) -> None:
         self.var.set(str(automaton))
 
 
 class RawAutomateFrame(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent: tk.Frame):
         super().__init__(parent)
         self.var = tk.StringVar()
         self.label = tk.Label(self, textvariable=self.var, font=("Courier", 11))
         self.label.pack()
 
-    def refresh(self, automaton):
+    def refresh(self, automaton: Automate) -> None:
         automaton.ecrire_automate_sur_fichier("temp/temp.txt")
         with open("temp/temp.txt") as fichier:
             self.var.set(fichier.read())
 
 
 class GraphvizFrame(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent: tk.Frame):
         super().__init__(parent)
         self.parent = parent
         self.label = tk.Label(self)
         self.label.pack()
 
-    def refresh(self, automaton):
+    def refresh(self, automaton: Automate):
         automaton.generer_graphe()
         img = Image.open("temp/temp.png")
         self.tkimage = ImageTk.PhotoImage(img)
@@ -66,7 +67,7 @@ class GraphvizFrame(tk.Frame):
 
 
 class NavFrame(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent: tk.Tk):
         super().__init__(parent)
         self.page = ("Raw Automate", "Table", "Graphviz")
         self.buttons = []
@@ -75,7 +76,7 @@ class NavFrame(tk.Frame):
                 tk.Button(self, text=self.page[i], command=lambda i=i: parent.show_frame(self.page[i])))
             self.buttons[i].grid(row=0, column=i)
 
-    def step_button(self, page_name):
+    def step_button(self, page_name: str) -> None:
         button = self.buttons[self.page.index(page_name)]
         a = 1 if 1 > 2 else 3
         if button["state"] == "normal" or button["state"] == "active":
@@ -87,6 +88,26 @@ class NavFrame(tk.Frame):
 
 
 class OperationFrame(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent: tk.Tk, automate: Callable):
         super().__init__(parent)
+        self.automate = automate
+        self.controller = parent
         self.operations = ("Determinisation", "Completion", "Minimisation", "Complémentarisation")
+        self.var = tk.StringVar()
+        self.button = tk.Button(self, text="►", command=lambda: self.run())
+        self.option_menu = tk.OptionMenu(self, self.var, *self.operations)
+        self.option_menu.pack(side="left")
+        self.button.pack(side="right")
+
+    def run(self) -> None:
+        operation = self.var.get()
+        automate = self.automate()
+        operations = {
+            "Determinisation": automate.determiniser,
+            "Completion": automate.completion,
+            "Minimisation": automate.minimiser,
+            "Complémentarisation": automate.automate_complementaire
+        }
+        if operation in self.operations:
+            operations[operation]()
+            self.controller.refresh()

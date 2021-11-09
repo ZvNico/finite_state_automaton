@@ -19,13 +19,13 @@ class App(tk.Tk):
         self.frames["Graphviz"] = GraphvizFrame(self.container)
         self.frames["Raw Automate"] = RawAutomateFrame(self.container)
         self.frames["Table"] = PrettyTableFrame(self.container)
-        self.label = tk.Label(text="Test")
-        self.automaton_list.pack()
-        self.navigation_frame.pack()
         for frame in self.frames.values():
             frame.grid(row=0, column=0, columnspan=1, rowspan=1, sticky="nsew")
+        self.operations_frame = OperationFrame(self, self.automaton_list.current)
+        self.automaton_list.pack()
+        self.navigation_frame.pack()
         self.container.pack()
-        self.label.pack()
+        self.operations_frame.pack()
         self.create_menu_bar()
         self.show_frame("Raw Automate")
 
@@ -36,8 +36,11 @@ class App(tk.Tk):
                 break
         self.frame = self.frames[frame_name]
         self.navigation_frame.step_button(frame_name)
-        self.frame.refresh(self.automaton_list.current())
+        self.refresh()
         self.frame.tkraise()
+
+    def refresh(self):
+        self.frame.refresh(self.automaton_list.current())
 
     def create_menu_bar(self) -> None:
         menu_bar = tk.Menu(self)
