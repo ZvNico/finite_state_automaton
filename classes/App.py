@@ -1,8 +1,6 @@
-import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-from Automate import Automate
-from Frames import *
+from .Frames import *
 
 
 class App(tk.Tk):

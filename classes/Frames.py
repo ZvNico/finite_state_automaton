@@ -1,4 +1,4 @@
-from Automate import Automate
+from .Automate import Automate
 import tkinter as tk
 from PIL import ImageTk, Image
 from typing import Callable
@@ -47,7 +47,7 @@ class RawAutomateFrame(tk.Frame):
         self.label.pack()
 
     def refresh(self, automaton: Automate) -> None:
-        automaton.ecrire_automate_sur_fichier("temp/temp.txt")
+        automaton.ecrire_automate_sur_fichier("../temp/temp.txt")
         with open("temp/temp.txt") as fichier:
             self.var.set(fichier.read())
 
@@ -92,7 +92,7 @@ class OperationFrame(tk.Frame):
         super().__init__(parent)
         self.automate = automate
         self.controller = parent
-        self.operations = ("Determinisation", "Completion", "Minimisation", "Complémentarisation")
+        self.operations = ("Determinisation", "Completion", "Minimisation", "Complémentarisation", "Standardisation")
         self.var = tk.StringVar()
         self.button = tk.Button(self, text="►", command=lambda: self.run())
         self.option_menu = tk.OptionMenu(self, self.var, *self.operations)
@@ -106,7 +106,8 @@ class OperationFrame(tk.Frame):
             "Determinisation": automate.determiniser,
             "Completion": automate.completion,
             "Minimisation": automate.minimiser,
-            "Complémentarisation": automate.automate_complementaire
+            "Complémentarisation": automate.automate_complementaire,
+            "Standardisation": automate.automate_standard,
         }
         if operation in self.operations:
             operations[operation]()

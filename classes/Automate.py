@@ -67,7 +67,7 @@ class Automate:
     def ecrire_automate_sur_fichier(self, filename: str) -> None:
         """fonction pour retranscrire un automate dans un fichier depuis les attributs de cette classe"""
         i = 1
-        automate_w = open(filename, 'w')
+        automate_w = open(filename[3:], 'w')
         automate_w.write(str(len(self.alphabet)))
         automate_w.write('\n')
         automate_w.write(str(len(self.initial) + len(self.terminal) + 1))
