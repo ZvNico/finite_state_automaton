@@ -1,0 +1,8 @@
+coverage==5.5
+graphviz==0.16
+importlib-metadata==3.7.3
+Pillow==8.3.2
+prettytable==2.1.0
+typing-extensions==3.7.4.3
+wcwidth==0.2.5
+zipp==3.4.1
