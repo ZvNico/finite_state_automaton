@@ -88,14 +88,19 @@ class NavFrame(tk.Frame):
 
 
 class OperationFrame(tk.Frame):
-    def __init__(self, parent: tk.Tk, automate: Callable):
+    def __init__(self, parent: tk.Tk, automate: Callable, output: Callable):
         super().__init__(parent)
         self.automate = automate
+        self.output = output
         self.controller = parent
-        self.operations = ("Determinisation", "Completion", "Minimisation", "Complémentarisation", "Standardisation")
+        self.operations = (
+        "Determinisation", "Completion", "Complémentarisation", "Standardisation", "retirer mot vide",
+        "ajouter mot vide")
         self.var = tk.StringVar()
         self.button = tk.Button(self, text="►", command=lambda: self.run())
         self.option_menu = tk.OptionMenu(self, self.var, *self.operations)
+        self.label = tk.Label(self, text="Lancer l'opération de")
+        self.label.pack(side="left")
         self.option_menu.pack(side="left")
         self.button.pack(side="right")
 
@@ -105,10 +110,79 @@ class OperationFrame(tk.Frame):
         operations = {
             "Determinisation": automate.determiniser,
             "Completion": automate.completion,
-            "Minimisation": automate.minimiser,
             "Complémentarisation": automate.automate_complementaire,
             "Standardisation": automate.automate_standard,
+            "retirer mot vide": automate.retirer_mot_vide,
+            "ajouter mot vide": automate.ajout_mot_vide,
         }
         if operation in self.operations:
             operations[operation]()
+            self.output(f"L'opération de {operation} a été effectué")
             self.controller.refresh()
+
+
+class ConditionFrame(tk.Frame):
+    def __init__(self, parent: tk.Tk, automate: Callable, output: Callable):
+        super().__init__(parent)
+        self.automate = automate
+        self.output = output
+        self.controller = parent
+        self.conditions = ("standart", "complet", "deterministe")
+        self.var = tk.StringVar()
+        self.button = tk.Button(self, text="►", command=lambda: self.run())
+        self.option_menu = tk.OptionMenu(self, self.var, *self.conditions)
+        self.label = tk.Label(self, text="Vérifier que l'automate est")
+        self.label.pack(side="left")
+        self.option_menu.pack(side="left")
+        self.button.pack(side="right")
+
+    def run(self) -> None:
+        condition = self.var.get()
+        automate = self.automate()
+        conditions = {
+            "standart": automate.est_un_automate_standart,
+            "complet": automate.est_un_automate_complet,
+            "deterministe": automate.est_un_automate_deterministe,
+        }
+        if condition in self.conditions:
+            res = conditions[condition]()
+            if res:
+                self.output(f"L'automate est {condition}")
+            else:
+                self.output(f"L'automate n'est pas {condition}")
+            self.controller.refresh()
+
+
+class OutputFrame(tk.Frame):
+    def __init__(self, parent: tk.Tk):
+        super().__init__(parent)
+        self.var = tk.StringVar()
+        self.var.set("")
+        self.label1 = tk.Label(self, text="Sortie:")
+        self.label2 = tk.Label(self, textvariable=self.var)
+        self.label1.pack(side="left")
+        self.label2.pack(side="right")
+
+    def output(self, output: str):
+        self.var.set(output)
+
+
+class InputFrame(tk.Frame):
+    def __init__(self, parent: tk.Tk, automate: Callable, output: Callable):
+        super().__init__(parent)
+        self.automate = automate
+        self.output = output
+        self.label = tk.Label(self, text="Lancer la reconnaissance du mot ")
+        self.input = tk.Entry(self)
+        self.button = tk.Button(self, text="►", command=self.enter)
+        self.label.pack(side="left")
+        self.input.pack(side="left")
+        self.button.pack(side="right")
+
+    def enter(self):
+        res = self.automate().reconnaitre_mot(self.input.get())
+        if res:
+            self.output(f"Le mot {self.input.get()} a été reconnu")
+        else:
+            self.output(f"Le mot {self.input.get()} n'a pas été reconnu")
+        self.input.delete(0, tk.END)

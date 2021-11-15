@@ -19,11 +19,17 @@ class App(tk.Tk):
         self.frames["Table"] = PrettyTableFrame(self.container)
         for frame in self.frames.values():
             frame.grid(row=0, column=0, columnspan=1, rowspan=1, sticky="nsew")
-        self.operations_frame = OperationFrame(self, self.automaton_list.current)
+        self.output_frame = OutputFrame(self)
+        self.operations_frame = OperationFrame(self, self.automaton_list.current, self.output_frame.output)
+        self.conditions_frame = ConditionFrame(self, self.automaton_list.current, self.output_frame.output)
+        self.input_frame = InputFrame(self, self.automaton_list.current, self.output_frame.output)
         self.automaton_list.pack()
         self.navigation_frame.pack()
         self.container.pack()
         self.operations_frame.pack()
+        self.conditions_frame.pack()
+        self.input_frame.pack()
+        self.output_frame.pack()
         self.create_menu_bar()
         self.show_frame("Raw Automate")
 
@@ -78,7 +84,7 @@ class App(tk.Tk):
 
     def about(self) -> None:
         messagebox.showinfo(title="About",
-                            message="This Desktop app Help you working with finite state automaton.\n\nHow to use:\n\nOpen a new automaton:\nfile -> open -> choose your automate txt files\nSave an automaton:\nfile -> save -> new file name\nRender Graphviz graph:\nfile -> render -> new file name\n\nDeveloped by Nicolas Baconnier & Rana danane & Nelson & Alain Chea")
+                            message="This Desktop app Help you working with finite state automaton.\n\nHow to use:\n\nOpen a new automaton:\nfile -> open -> choose your automate txt files\nSave an automaton:\nfile -> save -> new file name\nRender Graphviz graph:\nfile -> render -> new file name\n\nDeveloped by Nicolas Baconnier, Rania dahane, Nelson Amorim Branco & Alain Chea")
 
 
 """

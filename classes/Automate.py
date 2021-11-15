@@ -52,7 +52,7 @@ class Automate:
             n = lambda x: int(lines[x])
             for i in range(n(0)):
                 self.alphabet.append(ascii_lowercase[i])
-            for i in range(n(1)):
+            for i in range(1, n(1) + 1):
                 self.etats.append(str(i))
             for i in range(n0(2)):
                 self.initial.append(lines[2][2 * (1 + i)])
@@ -134,7 +134,16 @@ class Automate:
                     break
             return pos in self.terminal
         return -1
-        # print_or_tk("Erreur ... l'automate n'est pas deterministe", "ERROR")
+
+    def ajout_mot_vide(self):
+        if not self.est_un_automate_standart:
+            self.automate_standard()
+        self.terminal.append(self.initial[0])
+
+    def retirer_mot_vide(self):
+        if not self.est_un_automate_standart:
+            self.automate_standard()
+        self.terminal.remove(self.initial[0])
 
     def ajouter_transition(self, depart: str, symbole: str, arriver: str):
         if depart not in self.transitions:
@@ -171,8 +180,13 @@ class Automate:
             return False
         for value in self.transitions.values():
             for arriver in value.values():
-                if arriver in self.initial:
-                    return False
+                if isinstance(arriver, list):
+                    for etat in arriver:
+                        if etat in self.initial:
+                            return False
+                else:
+                    if arriver in self.initial:
+                        return False
         return True
 
     def est_un_automate_asynchrone(self) -> bool:
@@ -182,21 +196,6 @@ class Automate:
                 if key == "*":
                     return True
         return False
-
-    def elimination_epsilon(self) -> None:
-        """"""
-        supprimer = []
-        chercher_depuis_etat_a = lambda etat_a: [(key1, key2) for key1, value1 in self.transitions.items() for
-                                                 key2, value2 in value1.items() if key2 == etat_a]
-        for depart, value in self.transitions.items():
-            for symbole in value.keys():
-                if symbole == "*":
-                    fermeture_epsilon = value[symbole]
-                    supprimer.append(depart)
-                    for depart, transition2 in chercher_depuis_etat_a(fermeture_epsilon):
-                        self.ajouter_transition(depart, symbole, fermeture_epsilon)
-        for etat in supprimer:
-            del self.transitions[etat]['*']
 
     def completion(self) -> None:
         """Construction  de  l’automate  déterministe  et  complet  à  partir  de  l’automate synchrone et déterministe AF"""
@@ -253,11 +252,6 @@ class Automate:
         self.terminal = new_terminal
         self.transitions = new_transitions
 
-    def determinisation_et_completion_asynchrone(self) -> None:
-        if self.est_un_automate_asynchrone():
-            self.elimination_epsilon()
-        self.determinisation_et_completion_synchrone()
-
     def determinisation_et_completion_synchrone(self) -> None:
         if not self.est_un_automate_deterministe():
             self.determiniser()
@@ -267,9 +261,6 @@ class Automate:
     def automate_complementaire(self) -> None:
         """transformation de l'automate deterministe complet pour que celui ci reconnaisse le langage complémentaire à celui actuel"""
         self.terminal = [etat for etat in self.etats if etat not in self.terminal]
-
-    def minimiser(self) -> None:
-        """"""
 
     def automate_standard(self) -> None:
         """transformation de l'automate en automate standart"""
@@ -322,6 +313,7 @@ class Automate:
             self.terminal = new_terminal
             self.transitions = new_transitions
         if not self.est_un_automate_standart():
+            self.etats.append('i')
             self.transitions['i'] = self.transitions[self.initial[0]].copy()
             if self.initial[0] in self.terminal:
                 self.terminal.append('i')
